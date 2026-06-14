@@ -1,43 +1,63 @@
 import { db, storage } from "./firebase.js";
 
 import {
- collection,
- addDoc
+    collection,
+    addDoc
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 import {
- ref,
- uploadBytes,
- getDownloadURL
+    ref,
+    uploadBytes,
+    getDownloadURL
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js";
 
-window.publishPost = async () => {
+const postBtn = document.getElementById("postBtn");
 
- const title =
- document.getElementById("title").value;
+postBtn.addEventListener("click", async () => {
 
- const content =
- document.getElementById("content").value;
+    try {
 
- const file =
- document.getElementById("image").files[0];
+        const title = document.getElementById("title").value.trim();
+        const content = document.getElementById("content").value.trim();
+        const imageInput = document.getElementById("image");
 
- const imageRef =
- ref(storage, "posts/" + file.name);
+        if (!title || !content) {
+            alert("Please enter title and content.");
+            return;
+        }
 
- await uploadBytes(imageRef, file);
+        if (!imageInput.files.length) {
+            alert("Please select an image.");
+            return;
+        }
 
- const imageUrl =
- await getDownloadURL(imageRef);
+        const file = imageInput.files[0];
 
- await addDoc(
- collection(db, "posts"),
- {
-   title,
-   content,
-   imageUrl,
-   createdAt: Date.now()
- });
+        const imageRef = ref(
+            storage,
+            `posts/${Date.now()}_${file.name}`
+        );
 
- alert("Post Published");
-};
+        await uploadBytes(imageRef, file);
+
+        const imageUrl = await getDownloadURL(imageRef);
+
+        await addDoc(collection(db, "posts"), {
+            title: title,
+            content: content,
+            imageUrl: imageUrl,
+            createdAt: Date.now()
+        });
+
+        alert("Post Published Successfully!");
+
+        document.getElementById("title").value = "";
+        document.getElementById("content").value = "";
+        document.getElementById("image").value = "";
+
+    } catch (error) {
+        console.error(error);
+        alert("Error: " + error.message);
+    }
+
+});
