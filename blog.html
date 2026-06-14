@@ -29,7 +29,35 @@
     <p>Health articles, pregnancy nutrition tips, and wellness guides.</p>
 
     <div class="blog-posts">
+    <<div id="posts">
+    
+import { db } from "./firebase.js";
 
+import {
+ collection,
+ getDocs
+}
+from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+const querySnapshot =
+await getDocs(collection(db, "posts"));
+
+const container =
+document.getElementById("posts");
+
+querySnapshot.forEach((doc) => {
+
+ const post = doc.data();
+
+ container.innerHTML += `
+   <div>
+      <img src="${post.imageUrl}">
+      <h2>${post.title}</h2>
+      <p>${post.content}</p>
+   </div>
+ `;
+});
+</div>
         <div class="post-card">
             <h2>Pregnancy Nutrition Guide</h2>
             <p>Learn the best foods for a healthy pregnancy.</p>
